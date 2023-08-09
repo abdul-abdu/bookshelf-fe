@@ -1,5 +1,12 @@
 import React from "react";
-import { TextField, Button, Grid, Typography } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Grid,
+  Typography,
+  Container,
+  Stack,
+} from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, redirect } from "react-router-dom";
 import { registerUser } from "../../api";
@@ -12,9 +19,7 @@ export const Register: React.FC = ({}) => {
   const setUser = useAuthStore((store) => store.setUser);
   const onSubmit: SubmitHandler<TUser> = async (user) => {
     try {
-      console.log("asdasdasda");
       const { data } = await registerUser(user);
-
       localStorage.setItem(
         LOCAL_STORAGE.user,
         JSON.stringify({ key: data.data.key, secret: data.data.secret })
@@ -30,51 +35,51 @@ export const Register: React.FC = ({}) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid
-        container
+    <Container maxWidth="sm">
+      <Stack
+        onSubmit={handleSubmit(onSubmit)}
+        component="form"
         spacing={2}
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-        minHeight={"100vh"}
+        noValidate
+        autoComplete="off"
       >
-        <Grid item>
-          <Typography>Register</Typography>
-        </Grid>
-        <Grid item>
-          <TextField label="Name" variant="outlined" {...register("name")} />
-        </Grid>
-        <Grid item>
-          <TextField label="Email" variant="outlined" {...register("email")} />
-        </Grid>
-        <Grid item>
-          <TextField
-            label="Key"
-            type="password"
-            variant="outlined"
-            {...register("key")}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            label="Secret"
-            type="password"
-            variant="outlined"
-            {...register("secret")}
-          />
-        </Grid>
-        <Grid>
-          <small>
-            Already have an account <Link to="/sign-in">Login</Link>
-          </small>
-        </Grid>
-        <Grid item>
-          <Button type="submit" variant="contained" color="primary">
-            Register
-          </Button>
-        </Grid>
-      </Grid>
-    </form>
+        <Typography>Register</Typography>
+        <TextField
+          required
+          label="Name"
+          variant="outlined"
+          {...register("name")}
+        />
+
+        <TextField
+          required
+          label="Email"
+          variant="outlined"
+          {...register("email")}
+        />
+
+        <TextField
+          required
+          label="Key"
+          variant="outlined"
+          {...register("key")}
+        />
+
+        <TextField
+          required
+          label="Secret"
+          variant="outlined"
+          {...register("secret")}
+        />
+
+        <small>
+          Already have an account <Link to="/sign-in">Login</Link>
+        </small>
+
+        <Button type="submit" variant="contained" color="primary">
+          Register
+        </Button>
+      </Stack>
+    </Container>
   );
 };

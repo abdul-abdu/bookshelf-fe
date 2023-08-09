@@ -4,9 +4,10 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { TextField } from "@mui/material";
+import { LinearProgress, Stack, TextField } from "@mui/material";
 import toast from "react-hot-toast";
 import { createBook } from "../api";
+import { useMutation } from "@tanstack/react-query";
 
 const style = {
   position: "absolute" as "absolute",
@@ -25,26 +26,31 @@ type TInput = Pick<IBook, "isbn">;
 export const CreateBook: React.FC<{ refetchBooks: () => void }> = ({
   refetchBooks,
 }) => {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const { register, handleSubmit, reset } = useForm<any>();
-  const onSubmit: SubmitHandler<TInput> = async (input) => {
-    try {
-      const { data: _ } = await createBook({ isbn: input.isbn });
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (isbn: string) => {
+      return createBook({ isbn });
+    },
+    onSuccess: () => {
       toast("Book has been created", {
         style: { color: "green" },
       });
       refetchBooks();
-    } catch (error: any) {
-      console.log(error);
+    },
+    onError: (error: any) => {
       toast(error?.response?.data?.message, {
         style: { color: "red" },
       });
-    } finally {
+    },
+    onSettled: () => {
       reset();
-    }
-  };
+    },
+  });
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const { register, handleSubmit, reset } = useForm<any>();
+
+  const onSubmit: SubmitHandler<TInput> = async (input) => mutate(input.isbn);
 
   return (
     <div>
@@ -56,15 +62,17 @@ export const CreateBook: React.FC<{ refetchBooks: () => void }> = ({
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-            textAlign="center"
-          >
-            Create a book
-          </Typography>
-          <form onSubmit={handleSubmit(onSubmit)} style={{ margin: "2px 0" }}>
+          <Stack spacing={2} onSubmit={handleSubmit(onSubmit)} component="form">
+            {isLoading && <LinearProgress />}
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              textAlign="center"
+            >
+              Create a book
+            </Typography>
+
             <TextField
               fullWidth
               label="ISBN"
@@ -72,10 +80,15 @@ export const CreateBook: React.FC<{ refetchBooks: () => void }> = ({
               variant="outlined"
               {...register("isbn")}
             />
-            <Button fullWidth type="submit">
+            <Button
+              fullWidth
+              type="submit"
+              variant="contained"
+              disabled={isLoading}
+            >
               Create
             </Button>
-          </form>
+          </Stack>
         </Box>
       </Modal>
     </div>

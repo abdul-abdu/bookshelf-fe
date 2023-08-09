@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Typography, Stack, Grid, Box, Button, Modal } from "@mui/material";
+import React from "react";
+import { Typography, Stack, Grid, Box, Button } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { deleteBook, getBooks } from "../../api";
 import { CreateBook, SingleBook } from "../../components";
@@ -9,7 +9,6 @@ import { useAuthStore } from "../../store";
 import { LOCAL_STORAGE } from "../../constants";
 
 export const Home: React.FC = () => {
-  const [isModalOpen, setIsmodalOpen] = useState(false);
   const setUser = useAuthStore((s) => s.setUser);
   const {
     isLoading,
@@ -89,21 +88,6 @@ export const Home: React.FC = () => {
           <Typography variant="h4">Let`s create!</Typography>
         </Stack>
       )}
-      <Modal
-        open={isModalOpen}
-        onClose={() => setIsmodalOpen(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
-        </Box>
-      </Modal>
     </>
   );
 };

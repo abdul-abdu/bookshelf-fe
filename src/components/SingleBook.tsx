@@ -8,6 +8,7 @@ import {
   Button,
   CardActionArea,
   CardActions,
+  LinearProgress,
   ListItem,
   ListItemText,
   TextField,
@@ -15,6 +16,7 @@ import {
 import { SubmitHandler, useForm } from "react-hook-form";
 import { editBook } from "../api";
 import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
 
 const CARD_STYLE: React.CSSProperties = {
   fontSize: "40px",
@@ -35,16 +37,20 @@ export const SingleBook: React.FC<{
 }) => {
   const [flip, setFlip] = useState(false);
   const { register, handleSubmit } = useForm<any>();
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (status: number) => editBook(id, { status }),
+    onSuccess: () => {
+      toast("Status updated", { style: { color: "green" } });
+      setFlip((bool) => !bool);
+    },
+    onError: () => {
+      toast("Error while editing", { style: { color: "red" } });
+    },
+  });
   const editBookStatus: SubmitHandler<Pick<IBookData, "status">> = async (
     form
   ) => {
-    try {
-      await editBook(id, { status: form.status });
-      toast("Status updated", { style: { color: "green" } });
-      setFlip(!flip);
-    } catch (error: any) {
-      toast("Error while editing", { style: { color: "red" } });
-    }
+    mutate(form.status);
   };
 
   return (
@@ -96,6 +102,7 @@ export const SingleBook: React.FC<{
       {/* Back */}
       <div style={CARD_STYLE}>
         <Card>
+          {isLoading && <LinearProgress />}
           <form onSubmit={handleSubmit(editBookStatus)}>
             <TextField
               sx={{ textAlign: "center", mt: 2 }}
