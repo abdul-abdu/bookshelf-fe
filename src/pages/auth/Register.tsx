@@ -20,7 +20,7 @@ export const Register: React.FC = ({}) => {
   const setUser = useAuthStore((store) => store.setUser);
   const { isLoading, mutate } = useMutation({
     mutationFn: (user: TUser) => registerUser(user),
-    onSuccess: (data, user, context) => {
+    onSuccess: (data) => {
       localStorage.setItem(
         LOCAL_STORAGE.user,
         JSON.stringify({
