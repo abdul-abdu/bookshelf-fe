@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { deleteBook, getBooks } from "../../api";
 import { CreateBook, SingleBook } from "../../components";
 import toast from "react-hot-toast";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { redirect } from "react-router-dom";
 import { useAuthStore } from "../../store";
 import { LOCAL_STORAGE } from "../../constants";
@@ -38,7 +39,7 @@ export const Home: React.FC = () => {
         my={3}
       >
         <Box>
-          <img src="public/shelf.png" alt="logo" style={{ width: 50 }} />
+          <MenuBookIcon />
         </Box>
         <Box display="flex">
           <CreateBook refetchBooks={refetch} />
