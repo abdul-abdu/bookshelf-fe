@@ -3,13 +3,15 @@ import { Container } from "@mui/material";
 import { Route, Routes } from "react-router-dom";
 import { pages } from "./pages";
 import { useAuthStore } from "./store";
-import { Navbar, ProtectedRoute } from "./components";
+import { ProtectedRoute } from "./components";
 import { getMyself } from "./api";
 import { Toaster } from "react-hot-toast";
 
 const App: React.FC = () => {
-  const { user, setUser } = useAuthStore();
-  console.log(user);
+  const user = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
+
+  console.log({ user });
 
   useEffect(() => {
     (async () => {
@@ -21,23 +23,16 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="lg">
       <Toaster />
-      <Navbar />
       <Routes>
-        {pages.map(({ component: Page, isProtected, path }, index) =>
-          isProtected ? (
-            <Route
-              key={`${path}-${index}`}
-              path={path}
-              element={
-                <ProtectedRoute children={<Page />} isLoggedIn={!!user} />
-              }
-            />
-          ) : (
-            <Route path={path} element={<Page />} key={`${path}-${index}`} />
-          )
-        )}
+        {pages.map(({ component: Page, path }, index) => (
+          <Route
+            key={`${path}-${index}`}
+            path={path}
+            element={<ProtectedRoute children={<Page />} isLoggedIn={!!user} />}
+          />
+        ))}
       </Routes>
     </Container>
   );

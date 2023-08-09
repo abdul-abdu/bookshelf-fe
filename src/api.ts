@@ -1,5 +1,5 @@
 import axios from "axios";
-import CryptoJS from "crypto-js";
+import md5 from "md5";
 import { LOCAL_STORAGE } from "./constants";
 
 axios.defaults.baseURL = "https://no23.lavina.tech";
@@ -16,13 +16,16 @@ axios.interceptors.request.use(
     } else {
       const requestMethod = config.method?.toUpperCase();
       const requestPathWithQuery = config.url || "";
-      const requestBody = config.data || "";
-      const signData =
+      console.log(config.data);
+
+      const requestBody = config.data ? JSON.stringify(config.data) : "";
+
+      const signStr =
         requestMethod + requestPathWithQuery + requestBody + secret;
       // Calculate the MD5 hash of the sign data
-      const sign = CryptoJS.MD5(signData).toString();
-      config.headers.set("sign", sign);
-      config.headers.set("key", key);
+      const sign = md5(signStr);
+      config.headers.set("Sign", sign);
+      config.headers.set("Key", key);
     }
     return config;
   },
@@ -38,4 +41,10 @@ export const getMyself = () => axios.get<{ data: TUser }>("/myself");
 
 export const getBooks = () => axios.get<IBookApiResponse>("/books");
 
-export const createBook = () => axios.post("/books", {});
+export const createBook = (payload: Pick<IBook, "isbn">) =>
+  axios.post("/books", payload);
+
+export const deleteBook = (bookId: number) => axios.delete(`/books/${bookId}`);
+
+export const editBook = (bookId: number, payload: Pick<IBookData, "status">) =>
+  axios.patch(`/books/${bookId}`, payload);

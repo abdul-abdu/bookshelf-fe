@@ -8,11 +8,11 @@ import Button from "@mui/material/Button";
 export const Navbar: React.FC = () => {
   return (
     <Box sx={{ display: "flex", marginBottom: 10 }}>
-      {/* <CssBaseline /> */}
+      <CssBaseline />
       <AppBar component="nav">
         <Toolbar>
           <Box sx={{ flexGrow: 1 }}>
-            <img src="public/shelf.png" />
+            <img src="/shelf.png" />
           </Box>
           <Box>
             <Button sx={{ color: "#fff" }}>Craete</Button>

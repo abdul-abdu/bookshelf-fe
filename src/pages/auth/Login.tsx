@@ -20,7 +20,7 @@ export const Login: React.FC = ({}) => {
       console.log(response);
       setUser(response.data);
       redirect("/");
-    } catch (error) {
+    } catch (error: any) {
       toast(error?.response?.data?.message, {
         style: { color: "red" },
       });

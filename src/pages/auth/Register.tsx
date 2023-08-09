@@ -19,12 +19,9 @@ export const Register: React.FC = ({}) => {
         LOCAL_STORAGE.user,
         JSON.stringify({ key: data.data.key, secret: data.data.secret })
       );
-      console.log({ data });
       setUser(data.data);
       redirect("/");
-    } catch (error) {
-      console.log(error);
-
+    } catch (error: any) {
       toast(error?.response?.data?.message, {
         style: { color: "red" },
       });

@@ -1,33 +1,132 @@
-import * as React from "react";
+import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import { CardActionArea, ListItem, ListItemText } from "@mui/material";
+import ReactCardFlip from "react-card-flip";
+import {
+  Button,
+  CardActionArea,
+  CardActions,
+  ListItem,
+  ListItemText,
+  TextField,
+} from "@mui/material";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { editBook } from "../api";
+import toast from "react-hot-toast";
 
-export const SingleBook: React.FC<{ book: IBookData }> = ({
+const CARD_STYLE: React.CSSProperties = {
+  fontSize: "40px",
+  borderRadius: "4px",
+  maxWidth: 300,
+  minWidth: 200,
+};
+
+export const SingleBook: React.FC<{
+  book: IBookData;
+  onDelete: (bookId: number) => void;
+}> = ({
   book: {
     book: { author, cover, id, published, title },
     status,
   },
+  onDelete,
 }) => {
+  const [flip, setFlip] = useState(false);
+  const { register, handleSubmit } = useForm<any>();
+  const editBookStatus: SubmitHandler<Pick<IBookData, "status">> = async (
+    form
+  ) => {
+    try {
+      await editBook(id, { status: form.status });
+      toast("Status updated", { style: { color: "green" } });
+      setFlip(!flip);
+    } catch (error: any) {
+      toast("Error while editing", { style: { color: "red" } });
+    }
+  };
+
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardActionArea>
-        <CardMedia component="img" height="140" image={cover} alt="title" />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {title}
-          </Typography>
-          <ListItem key={id}>
-            <ListItemText
-              primary={title}
-              secondary={`Author: ${author}, Published: ${published}`}
+    <ReactCardFlip isFlipped={flip} flipDirection="vertical">
+      <div style={CARD_STYLE}>
+        {/* Old */}
+        <Card>
+          <CardActionArea>
+            <CardMedia component="img" height={200} image={cover} alt={title} />
+            <CardContent sx={{ height: 100 }}>
+              <Typography gutterBottom variant="caption" component="div">
+                {title}
+              </Typography>
+              <ListItem key={id}>
+                <ListItemText
+                  secondary={`Author: ${author}, Published: ${published}`}
+                />
+              </ListItem>
+              <Typography>Status: {status}</Typography>
+            </CardContent>
+          </CardActionArea>
+          <CardActions
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="info"
+              sx={{ width: 60 }}
+              onClick={() => setFlip(!flip)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="outlined"
+              color="warning"
+              onClick={() => onDelete(id)}
+              sx={{ width: 60 }}
+            >
+              Delete
+            </Button>
+          </CardActions>
+        </Card>
+      </div>
+
+      {/* Back */}
+      <div style={CARD_STYLE}>
+        <Card>
+          <form onSubmit={handleSubmit(editBookStatus)}>
+            <TextField
+              sx={{ textAlign: "center", mt: 2 }}
+              type="number"
+              label="Status"
+              defaultValue={status}
+              variant="outlined"
+              fullWidth
+              {...register("status")}
             />
-          </ListItem>
-          <Typography>Status: {status}</Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+
+            <CardActions
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="info"
+                sx={{ width: 60 }}
+                type="submit"
+              >
+                Update
+              </Button>
+            </CardActions>
+          </form>
+        </Card>
+        <br />
+      </div>
+    </ReactCardFlip>
   );
 };

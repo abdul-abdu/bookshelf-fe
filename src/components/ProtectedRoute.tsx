@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 type Props = {
   isLoggedIn: boolean;
@@ -6,10 +6,13 @@ type Props = {
 };
 
 export const ProtectedRoute = ({ isLoggedIn, children }: Props) => {
-  console.log({ isLoggedIn });
+  const location = useLocation();
 
-  if (!isLoggedIn) {
-    return <Navigate to="/sign-up" replace />;
+  if (!isLoggedIn && location.pathname !== "/sign-up") {
+    return <Navigate to="/sign-up" />;
+  }
+  if (isLoggedIn && location.pathname === "/sign-up") {
+    return <Navigate to="/" />;
   }
   return <>{children}</>;
 };
