@@ -38,7 +38,7 @@ export const Register: React.FC = ({}) => {
       reset();
     },
   });
-  const onSubmit: SubmitHandler<TUser> = async (user) => {
+  const onSubmit: SubmitHandler<TUser> = (user) => {
     mutate(user);
   };
 
