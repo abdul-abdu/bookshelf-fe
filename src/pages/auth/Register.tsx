@@ -2,10 +2,10 @@ import React from "react";
 import {
   TextField,
   Button,
-  Grid,
   Typography,
   Container,
   Stack,
+  LinearProgress,
 } from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, redirect } from "react-router-dom";
@@ -13,25 +13,33 @@ import { registerUser } from "../../api";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store";
 import { LOCAL_STORAGE } from "../../constants";
+import { useMutation } from "@tanstack/react-query";
 
 export const Register: React.FC = ({}) => {
   const { register, handleSubmit, reset } = useForm<TUser>();
   const setUser = useAuthStore((store) => store.setUser);
-  const onSubmit: SubmitHandler<TUser> = async (user) => {
-    try {
-      const { data } = await registerUser(user);
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (user: TUser) => registerUser(user),
+    onSuccess: (data, user, context) => {
       localStorage.setItem(
         LOCAL_STORAGE.user,
-        JSON.stringify({ key: data.data.key, secret: data.data.secret })
+        JSON.stringify({
+          key: data.data.data.key,
+          secret: data.data.data.secret,
+        })
       );
-      setUser(data.data);
+      setUser(data.data.data);
       redirect("/");
-    } catch (error: any) {
-      toast(error?.response?.data?.message, {
+    },
+    onError: (error: any) => {
+      toast(error?.response?.data?.message || "Error while registering", {
         style: { color: "red" },
       });
       reset();
-    }
+    },
+  });
+  const onSubmit: SubmitHandler<TUser> = async (user) => {
+    mutate(user);
   };
 
   return (
@@ -40,9 +48,9 @@ export const Register: React.FC = ({}) => {
         onSubmit={handleSubmit(onSubmit)}
         component="form"
         spacing={2}
-        noValidate
         autoComplete="off"
       >
+        {isLoading && <LinearProgress />}
         <Typography>Register</Typography>
         <TextField
           required
@@ -53,6 +61,7 @@ export const Register: React.FC = ({}) => {
 
         <TextField
           required
+          type="email"
           label="Email"
           variant="outlined"
           {...register("email")}
@@ -76,7 +85,12 @@ export const Register: React.FC = ({}) => {
           Already have an account <Link to="/sign-in">Login</Link>
         </small>
 
-        <Button type="submit" variant="contained" color="primary">
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
           Register
         </Button>
       </Stack>
