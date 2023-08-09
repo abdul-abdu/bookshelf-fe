@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  Typography,
-  Stack,
-  Grid,
-  Box,
-  Button,
-  Modal,
-  Divider,
-} from "@mui/material";
+import { Typography, Stack, Grid, Box, Button, Modal } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { deleteBook, getBooks } from "../../api";
 import { CreateBook, SingleBook } from "../../components";
